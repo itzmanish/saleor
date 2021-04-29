@@ -30,6 +30,7 @@ class TaxRateType:
     RESTAURANTS = "restaurants"
     SOCIAL_HOUSING = "social housing"
     STANDARD = "standard"
+    REDUCED = "reduced"
     WATER = "water"
     WINE = "wine"
 
@@ -57,6 +58,7 @@ class TaxRateType:
         (RESTAURANTS, "restaurants"),
         (SOCIAL_HOUSING, "social housing"),
         (STANDARD, "standard"),
+        (REDUCED, "reduced"),
         (WATER, "water"),
         (WINE, "wine"),
     )

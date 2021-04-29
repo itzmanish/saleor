@@ -1,6 +1,7 @@
 import json
 import logging
 from decimal import Decimal
+from saleor.payment.gateways.razorpay.plugin import RazorpayGatewayPlugin
 from typing import Dict, Optional
 
 import graphene
@@ -129,6 +130,21 @@ def create_payment(
     }
 
     payment, _ = Payment.objects.get_or_create(defaults=defaults, **data)
+
+    if payment.gateway == 'mirumee.payments.razorpay' and not payment.token.startswith(('order_')):
+        last_transaction: Optional[Transaction] = payment.transactions.filter(
+            kind=TransactionKind.CAPTURE).last()
+
+        if payment.can_authorize() and not last_transaction:
+            payment_data = create_payment_information(
+                payment=payment, payment_token=payment.token, store_source=False
+            )
+            plugin_manager = get_plugins_manager()
+            rzp_gateway = plugin_manager.get_plugin("mirumee.payments.razorpay")
+            response = rzp_gateway.create_order_id(payment_data)
+            payment.token = response.transaction_id
+            payment.save()
+
     return payment
 
 
